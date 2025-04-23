@@ -21,7 +21,7 @@ const ActionsTaskItem: React.FC<{ task: Task; isListInView1: boolean }> = ({
           taskId={task.id}
           isListInView1={isListInView1}
         />
-        <BtnMarkAsImportant taskId={task.id} taskImportant={task.important} />
+        <BtnMarkAsImportant taskId={task.id} taskImportant={task.importance} />
         <BtnDeleteTask taskId={task.id} />
         <BtnEditTask task={task} />
       </div>

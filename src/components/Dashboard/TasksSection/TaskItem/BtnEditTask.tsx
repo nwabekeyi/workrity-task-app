@@ -1,57 +1,60 @@
-import React, { useState } from "react";
+// src/components/Dashboard/BtnEditTask.tsx
+import React, { useState, useCallback } from "react";
 import { useAppDispatch } from "../../../../store/hooks";
 import ModalCreateTask from "../../Utilities/ModalTask";
-import OptionsSvg from "../../../../assets/options.svg"; // Regular SVG file import
+import OptionsSvg from "../../../../assets/options.svg";
 import { Task } from "../../../../interfaces";
-import useApi from "../../../../hooks/useApi"; // Assuming useApi hook is available
+import useApi from "../../../../hooks/useApi";
 import { tasksActions } from "../../Tasks.store";
 
 const BtnEditTask: React.FC<{ task: Task }> = ({ task }) => {
   const [modalEditTaskOpen, setModalEditTaskOpen] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+  const { put, loading, error } = useApi<Task, Task>(import.meta.env.VITE_API_URL);
 
-  // Call the useApi hook at the top level of the component
-  const { put } = useApi<Task, Task>(import.meta.env.VITE_API_URL);
-
-  // Close modal function
   const closeModalEditTask = () => {
     setModalEditTaskOpen(false);
   };
 
-  // Open modal function
   const openModalEditTask = () => {
     setModalEditTaskOpen(true);
   };
 
-  // API call to edit the task
-  const editTaskHandler = async (task: Task) => {
-    try {
-      // Call API to edit task using PUT request
-      const response = await put(task, `/tasks/${task.id}`);
-
-      // Dispatch updated task to the store
+  const editTaskHandler = useCallback(
+    async (taskData: Task | Omit<Task, "id">) => {
+      // Ensure taskData has an id, as this is for editing
       const updatedTask: Task = {
-        id: response.id,
-        title: response.title,
-        important: response.important,
-        description: response.description,
-        date: response.date,
-        completed: response.completed,
+        ...(taskData as Task), // Spread taskData first
+        id: task.id, // Explicitly set id last to avoid overwrite
       };
-
-      dispatch(tasksActions.editTask(updatedTask));
-      closeModalEditTask();
-    } catch (err) {
-      console.error("Failed to edit task:", err);
-    }
-  };
+      try {
+        const response = await put(updatedTask, `/tasks/${task.id}`);
+        const newTask: Task = {
+          id: response.id || response.id || task.id, // Handle _id or id
+          title: response.title || updatedTask.title, // Fallback to updatedTask
+          importance: response.importance ?? response.importance ?? updatedTask.importance,
+          description: response.description || updatedTask.description,
+          date: response.date || updatedTask.date,
+          completed: response.completed ?? updatedTask.completed,
+        };
+        dispatch(tasksActions.editTask(newTask));
+        alert("Task updated successfully!"); // First alert
+        closeModalEditTask();
+      } catch (err) {
+        console.error("Failed to edit task:", err);
+        alert("Failed to update task. Please try again.");
+      }
+    },
+    [task.id, put, dispatch]
+  );
 
   return (
     <>
       <button
-        title="edit task"
-        className="transition w-7 sm:w-8 h-6 sm:h-8 grid place-items-center dark:hover:text-slate-200 hover:text-slate-700"
+        title="Edit task"
+        className="transition w-7 sm:w-8 h-6 sm:h-8 grid place-items-center dark:hover:text-slate-200 hover:text-slate-700 disabled:opacity-50"
         onClick={openModalEditTask}
+        disabled={loading}
       >
         <img
           src={OptionsSvg}
@@ -67,8 +70,9 @@ const BtnEditTask: React.FC<{ task: Task }> = ({ task }) => {
           onConfirm={editTaskHandler}
         />
       )}
+      {error && <span className="text-red-500 text-sm">{error}</span>}
     </>
   );
 };
 
-export default BtnEditTask;
+export default React.memo(BtnEditTask);

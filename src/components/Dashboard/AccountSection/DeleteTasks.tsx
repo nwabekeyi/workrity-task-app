@@ -6,7 +6,8 @@ import useApi from "../../../hooks/useApi"; // Adjust path
 
 const DeleteTasks: React.FC = () => {
   const dispatch = useAppDispatch();
-  const userId = useAppSelector((state) => state.user.user.id);
+  const user = useAppSelector((state) => state.user.user);
+  const userId = user && user.id;
   const [showModal, setIsModalShown] = useState<boolean>(false);
   const { deleteItem, loading, error } = useApi<null, unknown>(
     import.meta.env.VITE_API_URL

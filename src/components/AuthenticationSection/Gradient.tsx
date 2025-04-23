@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Button } from "./Button";
 
 export function Gradient(): JSX.Element {
   const [greeting, setGreeting] = useState<string>("");

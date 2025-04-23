@@ -8,8 +8,8 @@ import useApi from "./useApi"; // Adjust path
 const useSortTasks = () => {
   const dispatch = useAppDispatch();
   const { tasks, loading, error } = useAppSelector((state) => state.tasks);
-  const userId = useAppSelector((state) => state.user.user.id); // Access userId
-  const [sortedBy, setSortedBy] = useState<string>("");
+  const user = useAppSelector((state) => state.user.user);
+  const userId = user && user.id;  const [sortedBy, setSortedBy] = useState<string>("");
   const [sortedTasks, setSortedTasks] = useState<Task[]>(tasks);
   const { getAll } = useApi<{ tasks: any[] }, unknown>(import.meta.env.VITE_API_URL);
 
@@ -24,7 +24,7 @@ const useSortTasks = () => {
         const transformedTasks = tasks.map((task: any) => ({
           id: task._id,
           title: task.title,
-          important: task.importance,
+          importance: task.importance,
           description: task.description,
           date: task.date,
           completed: task.completed,

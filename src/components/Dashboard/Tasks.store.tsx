@@ -36,7 +36,7 @@ const tasksSlice = createSlice({
     markAsImportant(state, action: PayloadAction<string>) {
       const task = state.tasks.find((task) => task.id === action.payload);
       if (task) {
-        task.important = !task.important;
+        task.importance = !task.importance;
       }
     },
     editTask(state, action: PayloadAction<Task>) {

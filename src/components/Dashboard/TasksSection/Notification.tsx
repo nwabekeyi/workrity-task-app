@@ -1,9 +1,10 @@
 import React, { useRef } from "react";
 import useVisibility from "../../../hooks/useVisibility";
 import IconBell from "../../../assets/bell.svg";
-import useTodayTasks from "../../../hooks/useTodayTasks";
 import useCompletedTasks from "../../../hooks/useCompletedTasks";
 import { Link } from "react-router-dom";
+import { useAppSelector } from "../../../store/hooks";
+import { getTodaysTasks } from "../Routes/TodaysTasks";
 
 const classHasNotification =
   "after:content-[''] after:w-2 after:h-2 after:bg-rose-500 block after:rounded-full after:absolute after:bottom-3/4  after:left-3/4";
@@ -16,7 +17,8 @@ const Notification: React.FC = () => {
     showElement: showNotifications,
   } = useVisibility([refBtnNotification.current!]);
 
-  const todaysTasks = useTodayTasks();
+  const tasks = useAppSelector((state) => state.tasks.tasks); // ✅ get all tasks
+  const todaysTasks = getTodaysTasks(tasks); // ✅ filter today's tasks
 
   const { tasks: uncompletedTasks } = useCompletedTasks({
     tasks: todaysTasks,
@@ -24,7 +26,6 @@ const Notification: React.FC = () => {
   });
 
   const tasksToShow = uncompletedTasks.slice(0, 3);
-
   const moreTasksToShow = uncompletedTasks.length > tasksToShow.length;
 
   return (
@@ -62,7 +63,7 @@ const Notification: React.FC = () => {
               </ul>
               {moreTasksToShow && (
                 <a
-                  href="/"
+                  href="/today"
                   className="transition block w-full rounded-md p-1 bg-rose-100 text-rose-600 dark:text-slate-200 dark:bg-slate-700/[.3] text-center"
                 >
                   See today's tasks

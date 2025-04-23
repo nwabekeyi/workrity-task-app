@@ -2,27 +2,29 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../../store/hooks";
 import useCompletedTasks from "../../../hooks/useCompletedTasks";
-import useTodayTasks from "../../../hooks/useTodayTasks";
+import { getTodaysTasks } from "../Routes/TodaysTasks"; // ✅ import from the same file
 
 const TasksDone: React.FC = () => {
-  const todaysTasks = useTodayTasks();
   const tasks = useAppSelector((state) => state.tasks.tasks);
+  const todaysTasks = getTodaysTasks(tasks);
+
   const { tasks: todayTasksDone } = useCompletedTasks({
     tasks: todaysTasks,
     done: true,
   });
+
   const { tasks: allTasksDone } = useCompletedTasks({
     tasks: tasks,
     done: true,
   });
 
   const percentageTodayTasks =
-    (todayTasksDone.length * 100) / todaysTasks.length;
+    (todayTasksDone.length * 100) / (todaysTasks.length || 1);
 
-  const percentageAllTasks = (allTasksDone.length * 100) / tasks.length;
+  const percentageAllTasks =
+    (allTasksDone.length * 100) / (tasks.length || 1);
 
   const todaysTasksToShow = todaysTasks.slice(0, 3);
-
   const showMore = todaysTasks.length > todaysTasksToShow.length;
 
   return (

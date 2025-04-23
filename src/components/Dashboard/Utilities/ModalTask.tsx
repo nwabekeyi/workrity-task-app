@@ -1,8 +1,7 @@
+// src/components/Dashboard/Utilities/ModalTask.tsx
 import React, { useRef, useState } from "react";
 import { Task } from "../../../interfaces";
-import { useAppSelector } from "../../../store/hooks";
 import Modal from "./Modal";
-import useApi from "../../../hooks/useApi"; // Ensure the hook is imported
 
 const InputCheckbox: React.FC<{
   label: string;
@@ -31,13 +30,8 @@ const ModalCreateTask: React.FC<{
   onClose: () => void;
   task?: Task;
   nameForm: string;
-  onConfirm: (task: Task) => void;
+  onConfirm: (task: Omit<Task, "id"> | Task) => void;
 }> = ({ onClose, task, nameForm, onConfirm }) => {
-  const user = useAppSelector((state) => state.user.user); // Get the user data
-  const apiUrl = import.meta.env.VITE_API_URL; // API URL from environment variables
-
-  const { post, loading } = useApi<any, Task>(apiUrl); // POST request using the useApi hook
-
   const today: Date = new Date();
   let day: number = today.getDate();
   let month: number = today.getMonth() + 1;
@@ -52,69 +46,31 @@ const ModalCreateTask: React.FC<{
   const todayDate: string = year + "-" + month + "-" + day;
   const maxDate: string = year + 1 + "-" + month + "-" + day;
 
-  const [description, setDescription] = useState<string>(() => {
-    if (task) {
-      return task.description;
-    }
-    return "";
-  });
-  const [title, setTitle] = useState<string>(() => {
-    if (task) {
-      return task.title;
-    }
-    return "";
-  });
-  const [date, setDate] = useState<string>(() => {
-    if (task) {
-      return task.date;
-    }
-    return todayDate;
-  });
+  const [description, setDescription] = useState<string>(task?.description || "");
+  const [title, setTitle] = useState<string>(task?.title || "");
+  const [date, setDate] = useState<string>(task?.date || todayDate);
+  const [isImportant, setIsImportant] = useState<boolean>(task?.importance || false);
+  const [isCompleted, setIsCompleted] = useState<boolean>(task?.completed || false);
 
-  const isTitleValid = useRef<Boolean>(false);
-  const isDateValid = useRef<Boolean>(false);
+  const isTitleValid = useRef<boolean>(false);
+  const isDateValid = useRef<boolean>(false);
 
-  const [isImportant, setIsImportant] = useState<boolean>(() => {
-    if (task) {
-      return task.important;
-    }
-    return false;
-  });
-
-  const [isCompleted, setIsCompleted] = useState<boolean>(() => {
-    if (task) {
-      return task.completed;
-    }
-    return false;
-  });
-
-  // Updated addNewTaskHandler function with async return type and logic to remove selectedDirectory
-  const addNewTaskHandler = async (event: React.FormEvent): Promise<void> => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
     isTitleValid.current = title.trim().length > 0;
     isDateValid.current = date.trim().length > 0;
 
-    if (isTitleValid.current && isDateValid.current && user) {
-      const newTask: Task = {
-        title: title,
-        description: description,
-        date: date,
+    if (isTitleValid.current && isDateValid.current) {
+      const taskData: Omit<Task, "id"> | Task = {
+        title,
+        description,
+        date,
         completed: isCompleted,
-        important: isImportant,
-        id: task?.id ? task.id : Date.now().toString(),
+        importance: isImportant,
+        ...(task?.id && { id: task.id }), // Include id for edit
       };
-
-      try {
-        const response = await post(newTask, `/tasks/${user.id}`); // Make the POST request with the userId in the URL
-        if (response.message === 'Task created successfully') {
-          onConfirm(response); // Pass the response to the parent component
-          onClose(); // Close the modal
-        }
-      } catch (err) {
-        console.error("Error creating task:", err);
-        alert("There was an issue creating the task. Please try again.");
-      }
+      onConfirm(taskData);
     } else {
       alert("Please fill in all required fields.");
     }
@@ -122,7 +78,7 @@ const ModalCreateTask: React.FC<{
 
   return (
     <Modal onClose={onClose} title={nameForm}>
-      <form className="flex flex-col stylesInputsField" onSubmit={addNewTaskHandler}>
+      <form className="flex flex-col stylesInputsField" onSubmit={handleSubmit}>
         <label>
           Title
           <input
@@ -165,7 +121,7 @@ const ModalCreateTask: React.FC<{
           setChecked={setIsCompleted}
           label="Mark as completed"
         />
-        <button type="submit" className="btn mt-5">
+        <button type="submit" className="btn mt-5" disabled={false}>
           {nameForm}
         </button>
       </form>
