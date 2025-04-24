@@ -10,7 +10,7 @@ This project is a minimal yet feature-rich application built with **React**, **T
 - [API Environment URL](#api-environment-url)
 - [ESLint Configuration](#eslint-configuration)
 - [Technologies](#technologies)
-- [Project Structure](#project-structure)
+
 
 
 
