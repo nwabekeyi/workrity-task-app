@@ -4,14 +4,17 @@ import { Task } from "../../../interfaces";
 import { useAppSelector } from "../../../store/hooks";
 import useDescriptionTitle from "../../../hooks/useDescriptionTitle";
 import LayoutRoutes from "../Utilities/LayoutRoutes";
+import useSortTasks from "../../../hooks/useSortTasks";
 
 const TaskOnly: React.FC = () => {
   const params = useParams();
   const navigate = useNavigate();
 
-  const tasks = useAppSelector((store) => store.tasks.tasks);
 
   const [matchedTask, setMatchedTask] = useState<Task[]>([]);
+
+  const { sortedBy, setSortedBy, sortedTasks } = useSortTasks();
+  const tasks = sortedTasks
 
   useEffect(() => {
     const taskId = params.taskId;
@@ -26,7 +29,7 @@ const TaskOnly: React.FC = () => {
 
   useDescriptionTitle(`Searching for ${title}`, "Task " + title);
 
-  return <LayoutRoutes title={title} tasks={matchedTask} />;
+  return <LayoutRoutes sortedBy={sortedBy} setSortedBy={setSortedBy} title={title} tasks={matchedTask} />;
 };
 
 export default TaskOnly;
