@@ -76,7 +76,7 @@ function Register() {
   ];
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     // Access form elements correctly using e.target.elements
     const formData = {
       username: (e.target as any).username.value,
@@ -84,10 +84,10 @@ function Register() {
       password: (e.target as any).password.value,
       profilePicture: (e.target as any).elements['profile-picture'].files[0] || null, // Correct way to access file input
     };
-  
+
     handleregister(formData);
   };
-  
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[100vh] flex-col">
