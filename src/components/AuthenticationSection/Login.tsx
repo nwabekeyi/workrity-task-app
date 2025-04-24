@@ -42,8 +42,9 @@ function Login() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center">
-        <div className='loder'></div>
+      <div className="flex justify-center items-center h-[100vh] flex-col">
+        <div className='loader'></div>
+        <p className="text-blue-500 ">Logging in user...</p>
       </div>
     );
   }
