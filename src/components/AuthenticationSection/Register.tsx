@@ -99,9 +99,9 @@ function Register() {
 
   return (
     <ContainerLayout>
-      <div className="mx-auto space-y-10 w-full max-w-sm lg:w-96">
+      <div className="mx-auto space-y-10 w-full max-w-sm lg:w-96 pt-20">
         <div className="text-center lg:text-start">
-          <img alt="Company logo" src={workrityLogo} className="size-16 mx-auto lg:mx-0" />
+          <img alt="Company logo" src={workrityLogo} className="w-[50%] mx-auto xs:mt-[100px] sm:mt-0 lg:mx-0" />
           <h3 className="mt-8 text-2xl/9 font-bold tracking-tight text-gray-900">
             Create new account
           </h3>
